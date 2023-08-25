@@ -49,7 +49,7 @@ def get_pizzas(request):
     data = request.query_params
     order_id = data.get('order_id')
     if order_id:
-        queryset = PizzaToppingRelation.objects.prefetch_related('pizza', 'pizza__cheese', 'pizza__pizza_base').filter(pizza__order_id=order_id).order_by('pizza_id').annotate(toppingCount=Count('pizza_id'))
+        queryset = PizzaToppingRelation.objects.select_related('pizza', 'pizza__cheese', 'pizza__pizza_base', 'topping').filter(pizza__order_id=order_id).order_by('pizza_id').annotate(toppingCount=Count('pizza_id'))
     seialized_data = PizzaSerializer(queryset, many=True).data
     result = list()
     for pizza_id, data in groupby(seialized_data, key=lambda x: x.get('pizza_id')):
